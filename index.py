@@ -16,6 +16,11 @@ col_bling = db["col_bling"]
 app = Flask(__name__)
 
 
+@app.route("/produtos")
+def produtos():
+    return
+
+
 @app.route("/callback")
 def callback():
     payload = request.args
@@ -39,10 +44,21 @@ def callback():
                 "token": response.json()["access_token"]
             }
         )
+        col_bling.insert_one(
+            {
+                "_id": 1,
+                "refresh_token": response.json()["refresh_token"]
+            }
+        )
     else:
         col_bling.update_one(
             {"_id": 0},
             {"$set": {"token": response.json()["access_token"]}}
+        )
+
+        col_bling.update_one(
+            {"_id": 1},
+            {"$set": {"refresh_token": response.json()["refresh_token"]}}
         )
     return jsonify(
         response.json()
